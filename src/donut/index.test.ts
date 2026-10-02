@@ -10,8 +10,8 @@ describe("DonutBrowser (live)", () => {
     expect(client.baseUrl).toBe("http://127.0.0.1:10108");
   });
 
-  it("getWayfernVersions", async () => {
-    const versions = await client.getWayfernVersions();
+  it("getBrowsersVersions", async () => {
+    const versions = await client.getBrowsersVersions();
     expect(Array.isArray(versions)).toBe(true);
     expect(versions.length).toBeGreaterThan(0);
     console.log("versions:", versions);
@@ -30,6 +30,6 @@ describe("DonutBrowser (live)", () => {
 
   it("throws DonutApiError on bad token", async () => {
     const bad = new DonutBrowser({ token: "bad-token" });
-    await expect(bad.getWayfernVersions()).rejects.toBeInstanceOf(DonutApiError);
+    await expect(bad.getBrowsersVersions()).rejects.toBeInstanceOf(DonutApiError);
   });
 });

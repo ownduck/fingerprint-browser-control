@@ -21,7 +21,7 @@ const client = new DonutBrowser({
   token: "YOUR_LOCAL_API_TOKEN",
 });
 
-await client.getWayfernVersions();
+await client.getBrowsersVersions();
 const { profiles } = await client.listProfilesWithProxies();
 await client.openUrl(profiles[0].id, "https://browserleaks.com/ip");
 ```

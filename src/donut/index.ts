@@ -45,7 +45,7 @@ export class DonutBrowser {
   }
 
   /** GET /v1/browsers/wayfern/versions */
-  getWayfernVersions(): Promise<string[]> {
+  getBrowsersVersions(): Promise<string[]> {
     return this.request("GET", "/v1/browsers/wayfern/versions");
   }
 
