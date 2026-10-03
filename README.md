@@ -19,11 +19,21 @@ const client = new DonutBrowser({
   // baseUrl 可选，默认 http://127.0.0.1:10108
   baseUrl: "http://127.0.0.1:10108",
   token: "YOUR_LOCAL_API_TOKEN",
+  // exeName 可选；指定后只匹配/启动该文件。
+  // 未指定时 Windows 优先级: Donut.exe → donutbrowser.exe；其它平台: Donut
 });
+
+if (!(await client.isRunning())) {
+  await client.start("F:\\data\\local\\Donut-Portable");
+}
 
 await client.getBrowsersVersions();
 const { profiles } = await client.listProfilesWithProxies();
-await client.openUrl(profiles[0].id, "https://browserleaks.com/ip");
+const profile = await client.getProfile(profiles[0].id);
+// profile.remote_debugging_port：运行中时为 CDP 端口，否则 null
+await client.openUrl(profile.id, "https://browserleaks.com/ip");
+await client.closeProfile(profile.id); // POST /v1/profiles/{id}/kill
+// await client.close(); // 关闭 Donut 进程本身
 ```
 
 ## Publish

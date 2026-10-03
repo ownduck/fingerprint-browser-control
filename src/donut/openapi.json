@@ -3869,6 +3869,14 @@
           "release_type": {
             "type": "string"
           },
+          "remote_debugging_port": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "CDP remote-debugging port when the profile is currently running locally. `null` when stopped, so API clients can drive the browser over CDP without a separate `/run` round-trip."
+          },
           "sync_mode": {
             "type": "string",
             "description": "Cloud sync mode: `\"Disabled\"`, `\"Regular\"` or `\"Encrypted\"`.\nSettable via `PUT /v1/profiles/{id}`; exposed here so a caller can read\nback what it set, and so a remote-launch caller can tell whether the\nprofile is actually available in cloud storage."

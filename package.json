@@ -1,6 +1,6 @@
 {
   "name": "@woosau/fingerprint-browser-control",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Node.js clients for fingerprint browser control (Donut first)",
   "license": "MIT",
   "type": "module",
@@ -40,5 +40,9 @@
     "tsup": "^8.4.0",
     "typescript": "^5.8.2",
     "vitest": "^3.0.9"
+  },
+  "dependencies": {
+    "execa": "^10.0.1",
+    "systeminformation": "^5.33.15"
   }
 }
