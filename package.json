@@ -1,7 +1,7 @@
 {
   "name": "@woosau/fingerprint-browser-control",
-  "version": "0.1.2",
-  "description": "Node.js clients for fingerprint browser control (Donut first)",
+  "version": "0.1.4",
+  "description": "Node.js clients for fingerprint browser control (Donut / YunLogin)",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -17,6 +17,7 @@
   "files": [
     "dist",
     "src/donut/openapi.json",
+    "src/yunlogin/openapi.json",
     "README.md",
     "LICENSE"
   ],
@@ -31,6 +32,7 @@
   "keywords": [
     "fingerprint-browser",
     "donut-browser",
+    "yunlogin",
     "cloakbrowser",
     "wayfern"
   ],

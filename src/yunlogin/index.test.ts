@@ -1,31 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { DonutApiError, DonutBrowser } from "./index.js";
+import { YunLoginApiError, YunLoginBrowser } from "./index.js";
 
-const EXE_PATH = "F:\\data\\local\\Donut-Portable\\Donut.exe";
-const TOKEN = "0xtrzOvYIge43Rl99e31hkJGSgMCORb_hMHoI6xgx6U";
+const EXE_PATH = "D:\\Program Files (x86)\\FbBrowser\\YunLogin.exe";
 
-const client = new DonutBrowser({ exePath: EXE_PATH, token: TOKEN });
+const client = new YunLoginBrowser({ exePath: EXE_PATH });
 
-describe("DonutBrowser (live)", () => {
-  it("requires absolute exePath", () => {
-    expect(() => new DonutBrowser({ exePath: "Donut.exe", token: TOKEN })).toThrow(/absolute/);
-    expect(client.baseUrl).toBe("http://127.0.0.1:10108");
+describe("YunLoginBrowser (live)", () => {
+  it("requires absolute exePath and defaults baseUrl", () => {
+    expect(() => new YunLoginBrowser({ exePath: "YunLogin.exe" })).toThrow(/absolute/);
+    expect(client.baseUrl).toBe("http://localhost:50213");
     expect(client.exePath).toBe(EXE_PATH);
   });
 
   it("isAvailable false when API unreachable", async () => {
-    const c = new DonutBrowser({
+    const c = new YunLoginBrowser({
       exePath: EXE_PATH,
-      token: TOKEN,
       baseUrl: "http://127.0.0.1:1",
     });
     await expect(c.isAvailable()).resolves.toBe(false);
   });
 
   it("start throws when exe missing and not running", async () => {
-    const c = new DonutBrowser({
-      exePath: "F:\\definitely-not-exist\\NoSuchDonutXYZ.exe",
-      token: TOKEN,
+    const c = new YunLoginBrowser({
+      exePath: "F:\\definitely-not-exist\\NoSuchYunLoginXYZ.exe",
     });
     await expect(c.isRunning()).resolves.toBe(false);
     await expect(c.start()).rejects.toThrow(/not found/);
@@ -65,22 +62,19 @@ describe("DonutBrowser (live)", () => {
     const detail = await client.getProfile(first.id);
     expect(detail).toEqual({ id: first.id, name: expect.any(String) });
     expect("proxy" in detail).toBe(false);
-    expect("remote_debugging_port" in detail).toBe(false);
 
     const proxy = await client.getProxy(first.id);
-    console.log("donut proxy:", proxy);
+    console.log("yunlogin proxy:", proxy);
     if (proxy) {
       expect(proxy).toHaveProperty("id");
       expect(proxy).toHaveProperty("name");
       expect(proxy).toHaveProperty("ip");
     }
 
-    await expect(client.getCdp(first.id)).resolves.toBeNull();
-
     await client.openProfile(first.id);
     const cdp = await client.getCdp(first.id);
-    console.log("donut cdp:", cdp);
-    expect(cdp).toMatch(/^http:\/\/localhost:\d+$/);
+    console.log("yunlogin cdp:", cdp);
+    expect(cdp === null || /^http:\/\/localhost:\d+$/.test(cdp)).toBe(true);
 
     await client.closeProfile(first.id);
     let closedCdp: string | null = cdp;
@@ -90,11 +84,12 @@ describe("DonutBrowser (live)", () => {
       await new Promise((r) => setTimeout(r, 500));
     }
     expect(closedCdp).toBeNull();
-  }, 60_000);
+  }, 90_000);
 
-  it("throws DonutApiError on bad token", async () => {
-    const bad = new DonutBrowser({ exePath: EXE_PATH, token: "bad-token" });
-    await expect(bad.listProxys()).rejects.toBeInstanceOf(DonutApiError);
+  it("throws YunLoginApiError on invalid account", async () => {
+    await expect(client.openProfile("definitely-not-a-real-account-id")).rejects.toBeInstanceOf(
+      YunLoginApiError,
+    );
   });
 
   it("close then start lifecycle", async () => {
@@ -105,15 +100,15 @@ describe("DonutBrowser (live)", () => {
     }
     await expect(client.isRunning()).resolves.toBe(false);
     await client.start();
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 60; i++) {
       if (await client.isRunning()) break;
-      await new Promise((r) => setTimeout(r, 250));
+      await new Promise((r) => setTimeout(r, 500));
     }
     await expect(client.isRunning()).resolves.toBe(true);
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 60; i++) {
       if (await client.isAvailable()) break;
       await new Promise((r) => setTimeout(r, 500));
     }
     await expect(client.isAvailable()).resolves.toBe(true);
-  }, 60_000);
+  }, 120_000);
 });

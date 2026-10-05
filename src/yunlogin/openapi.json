@@ -1,0 +1,1453 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "云登浏览器 Local API",
+    "description": "整理自 https://www.yunlogin.com/openapi（与客户端「自动化 → API」同源）。\n\nBase: http://localhost:50213\n\n约定：参数多为字符串；POST body 为 JSON；各接口每秒最多 1 次。\n注意：正式本地接口以 /api/v2 为主；环境 ID 字段常用 account_id / browserid / shopid。",
+    "version": "4.0.3.5",
+    "contact": {
+      "name": "YunLogin OpenAPI",
+      "url": "https://www.yunlogin.com/openapi"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:50213",
+      "description": "默认本地地址"
+    },
+    {
+      "url": "http://127.0.0.1:50213",
+      "description": "本机回环"
+    }
+  ],
+  "tags": [
+    {
+      "name": "概览"
+    },
+    {
+      "name": "浏览器"
+    },
+    {
+      "name": "分组管理"
+    },
+    {
+      "name": "环境管理"
+    },
+    {
+      "name": "自有代理管理"
+    },
+    {
+      "name": "插件中心"
+    },
+    {
+      "name": "Cookies管理"
+    }
+  ],
+  "paths": {
+    "/status": {
+      "get": {
+        "tags": [
+          "概览"
+        ],
+        "summary": "API接口状态",
+        "description": "检查 Local API 可用性。",
+        "operationId": "getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/browser/start": {
+      "get": {
+        "tags": [
+          "浏览器"
+        ],
+        "summary": "启动浏览器",
+        "description": "启动环境浏览器，返回 debuggingPort / ws / webdriver，可用于 Selenium/Puppeteer。",
+        "operationId": "startBrowser",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "环境ID"
+          },
+          {
+            "name": "headless",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
+            },
+            "description": "1=无头"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "success",
+                  "data": {
+                    "debuggingPort": "xxxx",
+                    "webdriver": "C:\\xxxx\\chromedriver.exe",
+                    "ws": {
+                      "selenium": "127.0.0.1:xxxx",
+                      "puppeteer": "ws://127.0.0.1:xxxx/devtools/browser/xxxxxx"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/browser/stop": {
+      "get": {
+        "tags": [
+          "浏览器"
+        ],
+        "summary": "关闭浏览器",
+        "description": "关闭指定环境浏览器。",
+        "operationId": "stopBrowser",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/browser/status": {
+      "get": {
+        "tags": [
+          "浏览器"
+        ],
+        "summary": "检测启动状态",
+        "description": "查询环境浏览器是否 Active，并返回 ws。",
+        "operationId": "browserStatus",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "data": {
+                    "status": "Active",
+                    "ws": {
+                      "selenium": "127.0.0.1:xxxx",
+                      "puppeteer": "ws://127.0.0.1:xxxx/devtools/browser/xxxxxx"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/shopidlist": {
+      "post": {
+        "tags": [
+          "浏览器"
+        ],
+        "summary": "获取环境列表id",
+        "description": "无请求体，返回全部环境 shopIds。",
+        "operationId": "shopIdList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {
+                    "shopIds": [
+                      "bfd0b654a605f9d53e5a5cdac939d74"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/shopseriallist": {
+      "post": {
+        "tags": [
+          "浏览器"
+        ],
+        "summary": "获取环境列表id和序号",
+        "description": "无请求体，返回 shopId + serial。",
+        "operationId": "shopSerialList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {
+                    "list": [
+                      {
+                        "shopId": "b2a354395c06b5e16e",
+                        "serial": 96
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/shopdetaillist": {
+      "post": {
+        "tags": [
+          "浏览器"
+        ],
+        "summary": "查询指纹信息",
+        "description": "按 browserid 批量查询环境详情（分组/代理/账号/指纹等）。",
+        "operationId": "shopDetailList",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "browserid"
+                ],
+                "properties": {
+                  "browserid": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "browserid": [
+                  "d03ca5de08ec8e02c4b78558ee84d7fc"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {
+                    "browser": [
+                      {
+                        "browserid": "608b78e0c121e262712eaeaba1aa98e1",
+                        "name": "云登浏览器_3"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/group/create": {
+      "post": {
+        "tags": [
+          "分组管理"
+        ],
+        "summary": "创建分组",
+        "description": "创建分组，返回 groupid。",
+        "operationId": "groupCreate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 40
+                  }
+                }
+              },
+              "example": {
+                "name": "xxx"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {
+                    "groupid": "fdrgdgsfgsertgreaay34575422",
+                    "group": "指纹浏览器测试分组"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/group/update": {
+      "post": {
+        "tags": [
+          "分组管理"
+        ],
+        "summary": "更新分组名称",
+        "description": "按 groupid 更新名称。",
+        "operationId": "groupUpdate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "groupid"
+                ],
+                "properties": {
+                  "groupid": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 40
+                  }
+                }
+              },
+              "example": {
+                "groupid": "9d19597b113ac7ed81225af48c364881",
+                "name": "分组测试"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/group/list": {
+      "post": {
+        "tags": [
+          "分组管理"
+        ],
+        "summary": "查询分组",
+        "description": "分页模糊查询分组。offer 最小 0，number 最大 20。注意返回字段官方写作 gropid。",
+        "operationId": "groupList",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "offer",
+                  "number"
+                ],
+                "properties": {
+                  "group": {
+                    "type": "string"
+                  },
+                  "offer": {
+                    "type": "integer"
+                  },
+                  "number": {
+                    "type": "integer",
+                    "maximum": 20
+                  }
+                }
+              },
+              "example": {
+                "group": "xxx",
+                "offer": 1,
+                "number": 20
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {
+                    "group": [
+                      {
+                        "name": "指纹浏览器测试分组-1",
+                        "gropid": "fdrgdgsfgsertgreaay34575422"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/create": {
+      "post": {
+        "tags": [
+          "环境管理"
+        ],
+        "summary": "创建浏览器指纹",
+        "description": "browser 数组创建环境；proxy.type 支持 self/general/socks5/http/https/local。同步 cookie 时 accounts.cookie 请传 \"[]\"。",
+        "operationId": "userCreate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "browser"
+                ],
+                "properties": {
+                  "browser": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              },
+              "example": {
+                "browser": [
+                  {
+                    "name": "指纹浏览器",
+                    "proxy": {
+                      "type": "local",
+                      "uuid": "",
+                      "PublicIP": "",
+                      "region": "",
+                      "https": {
+                        "Addr": ""
+                      }
+                    },
+                    "accounts": {
+                      "openurls": [
+                        ""
+                      ],
+                      "groupid": "",
+                      "cookie": ""
+                    },
+                    "accountsv2": [
+                      {
+                        "url": "",
+                        "user": "",
+                        "password": ""
+                      }
+                    ],
+                    "finger": {
+                      "kernelversion": "107"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/update": {
+      "post": {
+        "tags": [
+          "环境管理"
+        ],
+        "summary": "更新浏览器指纹",
+        "description": "browserid 必填，其余可选。",
+        "operationId": "userUpdate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "browser"
+                ],
+                "properties": {
+                  "browser": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "browserid"
+                      ],
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              },
+              "example": {
+                "browser": [
+                  {
+                    "name": "指纹浏览器",
+                    "browserid": "fdrgdgsfgsertgreaay345754555",
+                    "proxy": {
+                      "type": "",
+                      "uuid": "",
+                      "PublicIP": "",
+                      "region": "",
+                      "https": {
+                        "Addr": ""
+                      }
+                    },
+                    "accounts": {
+                      "openurls": [
+                        ""
+                      ],
+                      "groupid": "",
+                      "cookie": ""
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/list": {
+      "post": {
+        "tags": [
+          "环境管理"
+        ],
+        "summary": "查询创建的浏览器指纹",
+        "description": "按 browserid 列表查询创建后的环境配置。",
+        "operationId": "userList",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "browserid"
+                ],
+                "properties": {
+                  "browserid": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "browserid": [
+                  "08638991e03d59ccb9d26571bae80427"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {
+                    "apibrowser": [
+                      {
+                        "Name": "测试窗口-1",
+                        "browserid": "08638991e03d59ccb9d26571bae80427"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/delete": {
+      "post": {
+        "tags": [
+          "环境管理"
+        ],
+        "summary": "删除一个浏览器指纹",
+        "description": "批量删除环境。",
+        "operationId": "userDelete",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "browserid"
+                ],
+                "properties": {
+                  "browserid": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "browserid": [
+                  "d03ca5de08ec8e02c4b78558ee84d7fc"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/user/regroup": {
+      "post": {
+        "tags": [
+          "环境管理"
+        ],
+        "summary": "更新环境分组",
+        "description": "把多个环境转移到指定分组。",
+        "operationId": "userRegroup",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "browserid",
+                  "groupid"
+                ],
+                "properties": {
+                  "browserid": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "groupid": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "browserid": [
+                  "d03ca5de08ec8e02c4b78558ee84d7fc"
+                ],
+                "groupid": "xxx"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/selfproxy/create": {
+      "post": {
+        "tags": [
+          "自有代理管理"
+        ],
+        "summary": "添加自有代理",
+        "description": "新增自有代理。",
+        "operationId": "selfProxyCreate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "proxy"
+                ],
+                "properties": {
+                  "proxy": {
+                    "$ref": "#/components/schemas/SelfProxy"
+                  }
+                }
+              },
+              "example": {
+                "proxy": {
+                  "name": "代理1",
+                  "proxytype": 1,
+                  "proxyaddr": "1.1.1.1:2333",
+                  "proxyp": "7777777",
+                  "proxyu": "8888888",
+                  "notes": "代理"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/selfproxy/delete": {
+      "post": {
+        "tags": [
+          "自有代理管理"
+        ],
+        "summary": "删除自有代理",
+        "description": "按 deviceid 批量删除。",
+        "operationId": "selfProxyDelete",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "deviceid"
+                ],
+                "properties": {
+                  "deviceid": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "deviceid": [
+                  "9a8cc12c5e1663e3efcb05e6608869dc"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/selfproxy/list": {
+      "post": {
+        "tags": [
+          "自有代理管理"
+        ],
+        "summary": "查询自有代理列表",
+        "description": "分页查询，可按 name 过滤。",
+        "operationId": "selfProxyList",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page",
+                  "pageSize"
+                ],
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "page": 1,
+                "pageSize": 10,
+                "name": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success",
+                  "data": {
+                    "list": [
+                      {
+                        "deviceid": "cc12c5e1663e3efcb05e66088XX",
+                        "name": "代理修改",
+                        "proxyaddr": "1.1.1.1:2333",
+                        "proxytype": 1
+                      }
+                    ],
+                    "total": 1,
+                    "pageSize": 10,
+                    "currentPage": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/selfproxy/update": {
+      "post": {
+        "tags": [
+          "自有代理管理"
+        ],
+        "summary": "更新自有代理",
+        "description": "deviceid 必填；空字符串/0 表示不修改对应字段。",
+        "operationId": "selfProxyUpdate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "proxy"
+                ],
+                "properties": {
+                  "proxy": {
+                    "$ref": "#/components/schemas/SelfProxy"
+                  }
+                }
+              },
+              "example": {
+                "proxy": {
+                  "name": "代理修改",
+                  "proxytype": 0,
+                  "proxyaddr": "",
+                  "deviceid": "XXXX5e1663e3efcb05e66XXXXc",
+                  "notes": "修改",
+                  "proxyu": "99999",
+                  "proxyp": "55555"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/plugin/groupPluginList": {
+      "post": {
+        "tags": [
+          "插件中心"
+        ],
+        "summary": "获取分组插件",
+        "description": "文档示例同时出现 query pageIndex/pageSize；返回 globalPlugin / userPlugin。",
+        "operationId": "groupPluginList",
+        "parameters": [
+          {
+            "name": "pageIndex",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "sort": {
+                    "type": "string",
+                    "description": "1正序，非1倒序"
+                  }
+                }
+              },
+              "example": {
+                "page": 1,
+                "pageSize": 10,
+                "sort": "1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 200,
+                  "msg": "ok",
+                  "data": {
+                    "globalPlugin": {
+                      "list": [],
+                      "count": 0
+                    },
+                    "userPlugin": {
+                      "list": [],
+                      "count": 0
+                    }
+                  },
+                  "requestId": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/plugin/bindGroupPlugin": {
+      "post": {
+        "tags": [
+          "插件中心"
+        ],
+        "summary": "环境绑定分组插件",
+        "description": "把插件分组绑定到环境。",
+        "operationId": "bindGroupPlugin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "groupId",
+                  "accountIds"
+                ],
+                "properties": {
+                  "groupId": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "accountIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "groupId": [
+                  ""
+                ],
+                "accountIds": [
+                  ""
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 200,
+                  "data": {},
+                  "msg": "ok",
+                  "requestId": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/cookie/upsert": {
+      "post": {
+        "tags": [
+          "Cookies管理"
+        ],
+        "summary": "更新Cookies",
+        "description": "按 shopid 写入标准 cookie 数组。",
+        "operationId": "cookieUpsert",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "shopid",
+                  "cookies"
+                ],
+                "properties": {
+                  "shopid": {
+                    "type": "string"
+                  },
+                  "cookies": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/CookieItem"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "shopid": "900bc9bc9438f96654006add8e7d344b",
+                "cookies": [
+                  {
+                    "domain": ".XXX.cn",
+                    "hostOnly": false,
+                    "httpOnly": false,
+                    "name": "Hm_lpvt_a73626d29XXX",
+                    "path": "/",
+                    "sameSite": "",
+                    "secure": false,
+                    "session": false,
+                    "storeId": "",
+                    "value": "1711004434",
+                    "port": 443
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/userapi/cookie/clear": {
+      "post": {
+        "tags": [
+          "Cookies管理"
+        ],
+        "summary": "清理Cookies",
+        "description": "清理指定环境 cookies。",
+        "operationId": "cookieClear",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "shopid"
+                ],
+                "properties": {
+                  "shopid": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "shopid": "900bc9bc9438f96654006add8e7d344b"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "example": {
+                  "code": 0,
+                  "msg": "Success"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BasicResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "SelfProxy": {
+        "type": "object",
+        "required": [
+          "name",
+          "proxytype",
+          "proxyaddr"
+        ],
+        "properties": {
+          "deviceid": {
+            "type": "string",
+            "description": "更新时必填"
+          },
+          "name": {
+            "type": "string"
+          },
+          "proxytype": {
+            "type": "integer",
+            "description": "1有账密socks5;3无账密socks5;4http;5https;6http有账密;7https有账密;更新时0表示不改"
+          },
+          "proxyaddr": {
+            "type": "string",
+            "example": "1.1.1.1:2333"
+          },
+          "proxyu": {
+            "type": "string"
+          },
+          "proxyp": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "CookieItem": {
+        "type": "object",
+        "required": [
+          "name",
+          "value",
+          "domain"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "expirationDate": {
+            "type": "number"
+          },
+          "hostOnly": {
+            "type": "boolean"
+          },
+          "httpOnly": {
+            "type": "boolean"
+          },
+          "path": {
+            "type": "string"
+          },
+          "sameSite": {
+            "type": "string",
+            "enum": [
+              "Strict",
+              "Lax",
+              "None",
+              ""
+            ]
+          },
+          "secure": {
+            "type": "boolean"
+          },
+          "session": {
+            "type": "boolean"
+          },
+          "storeId": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

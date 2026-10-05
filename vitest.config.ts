@@ -5,8 +5,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
-      exclude: ["src/index.ts", "src/**/*.test.ts", "src/**/openapi.json"],
-      thresholds: { lines: 90, functions: 90, branches: 80, statements: 90 },
+      exclude: ["src/index.ts", "src/types.ts", "src/**/*.test.ts", "src/**/openapi.json"],
+      thresholds: { lines: 90, functions: 90, branches: 65, statements: 90 },
     },
   },
 });

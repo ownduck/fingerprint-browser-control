@@ -1,6 +1,10 @@
 # @woosau/fingerprint-browser-control
 
-多指纹浏览器控制库。各浏览器按目录拆分（含各自 `openapi.json`），根入口统一导出主类。
+多指纹浏览器控制库。Donut / YunLogin 共用统一返回值。
+
+- `ProfileInfo`：`id` / `name`
+- `ProxyInfo`：`id` / `name` / `ip`
+- `getCdp(profileId)`：返回 `http://localhost:9222` 这类完整地址，未运行则为 `null`
 
 ## Install
 
@@ -11,29 +15,35 @@ npm i @woosau/fingerprint-browser-control
 ## Usage
 
 ```ts
-import { DonutBrowser } from "@woosau/fingerprint-browser-control";
-// 以后例如：
-// import { CloakBrowser } from "@woosau/fingerprint-browser-control";
+import { DonutBrowser, YunLoginBrowser } from "@woosau/fingerprint-browser-control";
 
-const client = new DonutBrowser({
-  // baseUrl 可选，默认 http://127.0.0.1:10108
-  baseUrl: "http://127.0.0.1:10108",
+const donut = new DonutBrowser({
+  exePath: "F:\\data\\local\\Donut-Portable\\Donut.exe", // 必填绝对路径
   token: "YOUR_LOCAL_API_TOKEN",
-  // exeName 可选；指定后只匹配/启动该文件。
-  // 未指定时 Windows 优先级: Donut.exe → donutbrowser.exe；其它平台: Donut
+  // baseUrl 默认 http://127.0.0.1:10108
 });
 
-if (!(await client.isRunning())) {
-  await client.start("F:\\data\\local\\Donut-Portable");
-}
+const yun = new YunLoginBrowser({
+  exePath: "D:\\Program Files (x86)\\FbBrowser\\YunLogin.exe", // 必填绝对路径
+  // token 可选；baseUrl 默认 http://localhost:50213
+});
 
-await client.getBrowsersVersions();
-const { profiles } = await client.listProfilesWithProxies();
-const profile = await client.getProfile(profiles[0].id);
-// profile.remote_debugging_port：运行中时为 CDP 端口，否则 null
-await client.openUrl(profile.id, "https://browserleaks.com/ip");
-await client.closeProfile(profile.id); // POST /v1/profiles/{id}/kill
-// await client.close(); // 关闭 Donut 进程本身
+for (const client of [donut, yun]) {
+  if (!(await client.isRunning())) await client.start();
+  console.log(await client.isAvailable());
+
+  const proxies = await client.listProxys();
+  const { profiles } = await client.listProfiles();
+  const profile = await client.getProfile(profiles[0].id);
+  const proxy = await client.getProxy(profile.id); // { id, name, ip } | null
+
+  await client.openProfile(profile.id); // url 可选，Donut 默认 https://browserleaks.com/ip
+  const cdp = await client.getCdp(profile.id); // http://localhost:9222 | null
+  console.log(cdp, proxy);
+
+  await client.closeProfile(profile.id);
+  // await client.close(); // 关闭客户端进程本身
+}
 ```
 
 ## Publish
